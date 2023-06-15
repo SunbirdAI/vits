@@ -82,7 +82,7 @@ class TextAudioLoader(torch.utils.data.Dataset):
 
     def get_text(self, text):
         if self.cleaned_text:
-            text_norm = cleaned_text_to_sequence(text)
+            text_norm = text_to_sequence(text, self.text_cleaners)#cleaned_text_to_sequence(text)
         else:
             text_norm = text_to_sequence(text, self.text_cleaners)
         if self.add_blank:
@@ -220,7 +220,7 @@ class TextAudioSpeakerLoader(torch.utils.data.Dataset):
 
     def get_text(self, text):
         if self.cleaned_text:
-            text_norm = cleaned_text_to_sequence(text)
+            text_norm = text_to_sequence(text, self.text_cleaners)#cleaned_text_to_sequence(text)
         else:
             text_norm = text_to_sequence(text, self.text_cleaners)
         if self.add_blank:

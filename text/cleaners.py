@@ -60,6 +60,9 @@ def lowercase(text):
 def collapse_whitespace(text):
   return re.sub(_whitespace_re, ' ', text)
 
+def acholi_add(text):
+  text = re.sub(r'[!?xz/\[\],\.@#$%^&*]', ' ', text)
+  return text
 
 def convert_to_ascii(text):
   return unidecode(text)
@@ -74,8 +77,9 @@ def basic_cleaners(text):
 
 def transliteration_cleaners(text):
   '''Pipeline for non-English text that transliterates to ASCII.'''
-  text = convert_to_ascii(text)
   text = lowercase(text)
+  text = acholi_add(text)
+  text = convert_to_ascii(text)
   text = collapse_whitespace(text)
   return text
 
