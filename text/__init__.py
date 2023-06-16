@@ -76,7 +76,7 @@ def preprocess_text(txt, text_mapper, hps, uroman_dir=None, lang=None):
 
 
 # Mappings from symbol to numeric ID and vice versa:
-mapper = TextMapper("../ach/vocab.txt")
+mapper = TextMapper("ach/vocab.txt")
 _symbol_to_id = mapper._symbol_to_id#{s: i for i, s in enumerate(symbols)}
 _id_to_symbol = mapper._id_to_symbol#{i: s for i, s in enumerate(symbols)}
 
