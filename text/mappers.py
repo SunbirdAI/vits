@@ -1,7 +1,38 @@
-""" from https://github.com/keithito/tacotron """
-from text import cleaners
-#from text.symbols import symbols
+from IPython.display import Audio
+import os
+import re
+import glob
+import json
+import locale
+import tempfile
+import math
+import torch
+from torch import nn
+from torch.nn import functional as F
+from torch.utils.data import DataLoader
+import torchaudio
+import numpy as np
+import commons
+import utils
+import argparse
+import subprocess
+from data_utils import TextAudioLoader, TextAudioCollate, TextAudioSpeakerLoader, TextAudioSpeakerCollate
+from models import SynthesizerTrn
+from scipy.io.wavfile import write
 
+def utf_8(x = None):
+    return "UTF-8"
+locale.getpreferredencoding = utf_8
+
+
+def preprocess_char(text, lang=None):
+    """
+    Special treatement of characters in certain languages
+    """
+    #print(lang)
+    if lang == 'ron':
+        text = text.replace("ț", "ţ")
+    return text
 
 class TextMapper(object):
     def __init__(self, vocab_file):
@@ -74,73 +105,13 @@ def preprocess_text(txt, text_mapper, hps, uroman_dir=None, lang=None):
     txt = text_mapper.filter_oov(txt)
     return txt
 
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
 
-# Mappings from symbol to numeric ID and vice versa:
-mapper = TextMapper("ach/vocab.txt")
-_symbol_to_id = mapper._symbol_to_id#{s: i for i, s in enumerate(symbols)}
-_id_to_symbol = mapper._id_to_symbol#{i: s for i, s in enumerate(symbols)}
-
-
-def preprocess_text(txt, text_mapper, hps, uroman_dir=None, lang=None):
-    txt = preprocess_char(txt, lang=lang)
-    is_uroman = hps.data.training_files.split('.')[-1] == 'uroman'
-    if is_uroman:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            if uroman_dir is None:
-                cmd = f"git clone git@github.com:isi-nlp/uroman.git {tmp_dir}"
-                print(cmd)
-                subprocess.check_output(cmd, shell=True)
-                uroman_dir = tmp_dir
-            uroman_pl = os.path.join(uroman_dir, "bin", "uroman.pl")
-            print(f"uromanize")
-            txt = text_mapper.uromanize(txt, uroman_pl)
-            print(f"uroman text: {txt}")
-    txt = txt.lower()
-    txt = text_mapper.filter_oov(txt)
-    return txt
-
-
-def text_to_sequence(text, cleaner_names):
-  '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
-    Args:
-      text: string to convert to a sequence
-      cleaner_names: names of the cleaner functions to run the text through
-    Returns:
-      List of integers corresponding to the symbols in the text
-  '''
-  sequence = []
-
-  clean_text = _clean_text(text, cleaner_names)
-  for symbol in clean_text:
-    symbol_id = _symbol_to_id[symbol]
-    sequence += [symbol_id]
-  return sequence
-
-
-def cleaned_text_to_sequence(cleaned_text):
-  '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
-    Args:
-      text: string to convert to a sequence
-    Returns:
-      List of integers corresponding to the symbols in the text
-  '''
-  sequence = [_symbol_to_id[symbol] for symbol in cleaned_text]
-  return sequence
-
-
-def sequence_to_text(sequence):
-  '''Converts a sequence of IDs back to a string'''
-  result = ''
-  for symbol_id in sequence:
-    s = _id_to_symbol[symbol_id]
-    result += s
-  return result
-
-
-def _clean_text(text, cleaner_names):
-  for name in cleaner_names:
-    cleaner = getattr(cleaners, name)
-    if not cleaner:
-      raise Exception('Unknown cleaner: %s' % name)
-    text = cleaner(text)
-  return text
+print(f"Run inference with {device}")
+vocab_file = f"{ckpt_dir}/vocab.txt" #TODO not this ugly way
+config_file = f"{ckpt_dir}/config.json" #TODO not this ugly way
+hps = utils.get_hparams_from_file(config_file)
+text_mapper = TextMapper(vocab_file)
