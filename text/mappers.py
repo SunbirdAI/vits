@@ -109,8 +109,3 @@ if torch.cuda.is_available():
 else:
     device = torch.device("cpu")
 
-print(f"Run inference with {device}")
-vocab_file = f"{ckpt_dir}/vocab.txt" #TODO not this ugly way
-config_file = f"{ckpt_dir}/config.json" #TODO not this ugly way
-hps = utils.get_hparams_from_file(config_file)
-text_mapper = TextMapper(vocab_file)
