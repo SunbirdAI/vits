@@ -16,7 +16,6 @@ import commons
 import utils
 import argparse
 import subprocess
-from data_utils import TextAudioLoader, TextAudioCollate, TextAudioSpeakerLoader, TextAudioSpeakerCollate
 from models import SynthesizerTrn
 from scipy.io.wavfile import write
 
