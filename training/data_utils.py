@@ -8,8 +8,8 @@ import torch.utils.data
 import commons 
 from mel_processing import spectrogram_torch
 from utils import load_wav_to_torch, load_filepaths_and_text
-from text import text_to_sequence, cleaned_text_to_sequence
-
+#from text import text_to_sequence, cleaned_text_to_sequence
+from text.mappers import TextMapper
 
 class TextAudioLoader(torch.utils.data.Dataset):
     """
@@ -17,21 +17,24 @@ class TextAudioLoader(torch.utils.data.Dataset):
         2) normalizes text and converts them to sequences of integers
         3) computes spectrograms from audio files.
     """
-    def __init__(self, audiopaths_and_text, hparams):
+    def __init__(self, audiopaths_and_text, hparams, text_mapper):
         self.audiopaths_and_text = load_filepaths_and_text(audiopaths_and_text)
-        self.text_cleaners  = hparams.text_cleaners
-        self.max_wav_value  = hparams.max_wav_value
-        self.sampling_rate  = hparams.sampling_rate
-        self.filter_length  = hparams.filter_length 
-        self.hop_length     = hparams.hop_length 
-        self.win_length     = hparams.win_length
-        self.sampling_rate  = hparams.sampling_rate 
+        self.data_root_dir  = hparams["data_root_dir"]
+        self.text_cleaners  = hparams["text_cleaners"]
+        self.max_wav_value  = hparams["max_wav_value"]
+        self.sampling_rate  = hparams["sampling_rate"]
+        self.filter_length  = hparams["filter_length"]
+        self.hop_length     = hparams["hop_length"]
+        self.win_length     = hparams["win_length"]
+        self.sampling_rate  = hparams["sampling_rate"]
 
         self.cleaned_text = getattr(hparams, "cleaned_text", False)
 
-        self.add_blank = hparams.add_blank
+        self.add_blank = hparams["add_blank"]
         self.min_text_len = getattr(hparams, "min_text_len", 1)
         self.max_text_len = getattr(hparams, "max_text_len", 190)
+
+        self.text_mapper = text_mapper
 
         random.seed(1234)
         random.shuffle(self.audiopaths_and_text)
@@ -50,6 +53,7 @@ class TextAudioLoader(torch.utils.data.Dataset):
         lengths = []
         for audiopath, text in self.audiopaths_and_text:
             if self.min_text_len <= len(text) and len(text) <= self.max_text_len:
+                audiopath = os.path.join(self.data_root_dir, audiopath)
                 audiopaths_and_text_new.append([audiopath, text])
                 lengths.append(os.path.getsize(audiopath) // (2 * self.hop_length))
         self.audiopaths_and_text = audiopaths_and_text_new
@@ -82,9 +86,9 @@ class TextAudioLoader(torch.utils.data.Dataset):
 
     def get_text(self, text):
         if self.cleaned_text:
-            text_norm = text_to_sequence(text, self.text_cleaners)#cleaned_text_to_sequence(text)
+            text_norm = self.text_mapper.text_to_sequence(text, self.text_cleaners)#cleaned_text_to_sequence(text)
         else:
-            text_norm = text_to_sequence(text, self.text_cleaners)
+            text_norm = self.text_mapper.text_to_sequence(text, self.text_cleaners)
         if self.add_blank:
             text_norm = commons.intersperse(text_norm, 0)
         text_norm = torch.LongTensor(text_norm)
@@ -155,22 +159,24 @@ class TextAudioSpeakerLoader(torch.utils.data.Dataset):
         2) normalizes text and converts them to sequences of integers
         3) computes spectrograms from audio files.
     """
-    def __init__(self, audiopaths_sid_text, hparams):
+    def __init__(self, audiopaths_sid_text, hparams, text_mappers):
         self.audiopaths_sid_text = load_filepaths_and_text(audiopaths_sid_text)
-        self.text_cleaners = hparams.text_cleaners
-        self.max_wav_value = hparams.max_wav_value
-        self.sampling_rate = hparams.sampling_rate
-        self.filter_length  = hparams.filter_length
-        self.hop_length     = hparams.hop_length
-        self.win_length     = hparams.win_length
-        self.sampling_rate  = hparams.sampling_rate
+        self.text_cleaners = hparams["text_cleaners"]
+        self.data_root_dir = hparams["data_root_dir"]
+        self.max_wav_value = hparams["max_wav_value"]
+        self.sampling_rate = hparams["sampling_rate"]
+        self.filter_length  = hparams["filter_length"]
+        self.hop_length     = hparams["hop_length"]
+        self.win_length     = hparams["win_length"]
+        self.sampling_rate  = hparams["sampling_rate"]
 
         self.cleaned_text = getattr(hparams, "cleaned_text", False)
 
-        self.add_blank = hparams.add_blank
+        self.add_blank = hparams["add_blank"]
         self.min_text_len = getattr(hparams, "min_text_len", 1)
         self.max_text_len = getattr(hparams, "max_text_len", 190)
 
+        self.text_mappers = text_mappers
         random.seed(1234)
         random.shuffle(self.audiopaths_sid_text)
         self._filter()
@@ -187,6 +193,7 @@ class TextAudioSpeakerLoader(torch.utils.data.Dataset):
         lengths = []
         for audiopath, sid, text in self.audiopaths_sid_text:
             if self.min_text_len <= len(text) and len(text) <= self.max_text_len:
+                audiopath = os.path.join(self.data_root_dir, audiopath)
                 audiopaths_sid_text_new.append([audiopath, sid, text])
                 lengths.append(os.path.getsize(audiopath) // (2 * self.hop_length))
         self.audiopaths_sid_text = audiopaths_sid_text_new
@@ -220,9 +227,9 @@ class TextAudioSpeakerLoader(torch.utils.data.Dataset):
 
     def get_text(self, text):
         if self.cleaned_text:
-            text_norm = text_to_sequence(text, self.text_cleaners)#cleaned_text_to_sequence(text)
+            text_norm = self.text_mappers.text_to_sequence(text, self.text_cleaners)#cleaned_text_to_sequence(text)
         else:
-            text_norm = text_to_sequence(text, self.text_cleaners)
+            text_norm = self.text_mappers.text_to_sequence(text, self.text_cleaners)
         if self.add_blank:
             text_norm = commons.intersperse(text_norm, 0)
         text_norm = torch.LongTensor(text_norm)

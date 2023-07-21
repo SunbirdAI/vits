@@ -10,7 +10,6 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
-import torchaudio
 import numpy as np
 import commons
 import utils
@@ -18,6 +17,7 @@ import argparse
 import subprocess
 from models import SynthesizerTrn
 from scipy.io.wavfile import write
+from text import cleaners
 
 def utf_8(x = None):
     return "UTF-8"
@@ -33,12 +33,23 @@ def preprocess_char(text, lang=None):
         text = text.replace("ț", "ţ")
     return text
 
+
+
 class TextMapper(object):
     def __init__(self, vocab_file):
         self.symbols = [x.replace("\n", "") for x in open(vocab_file, encoding="utf-8").readlines()]
         self.SPACE_ID = self.symbols.index(" ")
         self._symbol_to_id = {s: i for i, s in enumerate(self.symbols)}
         self._id_to_symbol = {i: s for i, s in enumerate(self.symbols)}
+
+    @staticmethod
+    def _clean_text(text, cleaner_names):
+        for name in cleaner_names:
+            cleaner = getattr(cleaners, name)
+            if not cleaner:
+                raise Exception('Unknown cleaner: %s' % name)
+            text = cleaner(text)
+        return text
 
     def text_to_sequence(self, text, cleaner_names):
         '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
@@ -49,7 +60,9 @@ class TextMapper(object):
         List of integers corresponding to the symbols in the text
         '''
         sequence = []
-        clean_text = text.strip()
+        #clean_text = text.strip()
+        sequence = []
+        clean_text = self._clean_text(text, cleaner_names)
         for symbol in clean_text:
             symbol_id = self._symbol_to_id[symbol]
             sequence += [symbol_id]

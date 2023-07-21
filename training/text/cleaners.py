@@ -61,7 +61,7 @@ def collapse_whitespace(text):
   return re.sub(_whitespace_re, ' ', text)
 
 def acholi_add(text):
-  text = re.sub(r'[!?xz/\[\],\.@;#$%^&*]', ' ', text)
+  text = re.sub(r'[!?xz/\[\]\,\.@;#$%^&*]', ' ', text)
   return text
 
 def convert_to_ascii(text):
