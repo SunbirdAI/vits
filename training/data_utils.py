@@ -63,7 +63,10 @@ class TextAudioLoader(torch.utils.data.Dataset):
         # separate filename and text
         audiopath, text = audiopath_and_text[0], audiopath_and_text[1]
         text = self.get_text(text)
-        spec, wav = self.get_audio(audiopath)
+        try:
+            spec, wav = self.get_audio(audiopath)
+        except:
+            raise ValueError(f"Empty/Corrupt file/path: {audiopath}")
         return (text, spec, wav)
 
     def get_audio(self, filename):

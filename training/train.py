@@ -151,7 +151,7 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
           config["data"]["sampling_rate"],
           config["data"]["mel_fmin"], 
           config["data"]["mel_fmax"])
-      y_mel = commons.slice_segments(mel, ids_slice, hps.train.segment_size // hps.data.hop_length)
+      y_mel = commons.slice_segments(mel, ids_slice, config["train"]["segment_size"] // config["data"]["hop_length"])
       y_hat_mel = mel_spectrogram_torch(
           y_hat.squeeze(1), 
           config["data"]["filter_length"], 
@@ -163,7 +163,7 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
           config["data"]["mel_fmax"]
       )
 
-      y = commons.slice_segments(y, ids_slice * hps.data.hop_length, hps.train.segment_size) # slice 
+      y = commons.slice_segments(y, ids_slice * config["data"]["hop_length"], config["train"]["segment_size"]) # slice 
 
       # Discriminator
       y_d_hat_r, y_d_hat_g, _, _ = net_d(y, y_hat.detach())
@@ -181,8 +181,8 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
       y_d_hat_r, y_d_hat_g, fmap_r, fmap_g = net_d(y, y_hat)
       with autocast(enabled=False):
         loss_dur = torch.sum(l_length.float())
-        loss_mel = F.l1_loss(y_mel, y_hat_mel) * hps.train.c_mel
-        loss_kl = kl_loss(z_p, logs_q, m_p, logs_p, z_mask) * hps.train.c_kl
+        loss_mel = F.l1_loss(y_mel, y_hat_mel) * config["train"]["c_mel"]
+        loss_kl = kl_loss(z_p, logs_q, m_p, logs_p, z_mask) * config["train"]["c_kl"]
 
         loss_fm = feature_loss(fmap_r, fmap_g)
         loss_gen, losses_gen = generator_loss(y_d_hat_g)
@@ -195,7 +195,7 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
     scaler.update()
 
     #if rank==0:
-    if global_step % hps.train.log_interval == 0:
+    if global_step % config["train"]["log_interval"] == 0:
       lr = optim_g.param_groups[0]['lr']
       losses = [loss_disc, loss_gen, loss_fm, loss_mel, loss_dur, loss_kl]
       logger.info('Train Epoch: {} [{:.0f}%]'.format(
@@ -215,16 +215,16 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
           "all/mel": utils.plot_spectrogram_to_numpy(mel[0].data.cpu().numpy()),
           "all/attn": utils.plot_alignment_to_numpy(attn[0,0].data.cpu().numpy())
       }
-      utils.summarize(
-        writer=writer,
-        global_step=global_step, 
-        images=image_dict,
-        scalars=scalar_dict)
+      #utils.summarize(
+      #  writer=writer,
+      #  global_step=global_step, 
+      #  images=image_dict,
+      #  scalars=scalar_dict)
 
-      if global_step % hps.train.eval_interval == 0:
-        evaluate(hps, net_g, eval_loader, writer_eval)
-        utils.save_checkpoint(net_g, optim_g, hps.train.learning_rate, epoch, os.path.join(hps.model_dir, "G_{}.pth".format(global_step)))
-        utils.save_checkpoint(net_d, optim_d, hps.train.learning_rate, epoch, os.path.join(hps.model_dir, "D_{}.pth".format(global_step)))
+      if global_step % config["train"]["eval_interval"] == 0:
+        evaluate(config, net_g, eval_loader, None)
+        utils.save_checkpoint(net_g, optim_g, config["train"]["learning_rate"], epoch, os.path.join(config["model_dir"], "G_{}.pth".format(global_step)))
+        utils.save_checkpoint(net_d, optim_d, config["train"]["learning_rate"], epoch, os.path.join(config["model_dir"], "D_{}.pth".format(global_step)))
     global_step += 1
   
   logger.info('====> Epoch: {}'.format(epoch))
@@ -247,7 +247,7 @@ def evaluate(config, generator, eval_loader, writer_eval):
         y = y[:1]
         y_lengths = y_lengths[:1]
         break
-      y_hat, attn, mask, *_ = generator.module.infer(x, x_lengths, max_len=1000)
+      y_hat, attn, mask, *_ = generator.infer(x, x_lengths, max_len=1000)
       y_hat_lengths = mask.sum([1,2]).long() * config["data"]["hop_length"]
 
       mel = spec_to_mel_torch(
@@ -277,13 +277,13 @@ def evaluate(config, generator, eval_loader, writer_eval):
       image_dict.update({"gt/mel": utils.plot_spectrogram_to_numpy(mel[0].cpu().numpy())})
       audio_dict.update({"gt/audio": y[0,:,:y_lengths[0]]})
 
-    utils.summarize(
-      writer=writer_eval,
-      global_step=global_step, 
-      images=image_dict,
-      audios=audio_dict,
-      audio_sampling_rate=hps.data.sampling_rate
-    )
+    # utils.summarize(
+    #   writer=writer_eval,
+    #   global_step=global_step, 
+    #   images=image_dict,
+    #   audios=audio_dict,
+    #   audio_sampling_rate=config["data"]["sampling_rate"]
+    # )
     generator.train()
 
                            

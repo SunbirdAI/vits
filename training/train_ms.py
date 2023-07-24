@@ -249,7 +249,7 @@ def evaluate(hps, generator, eval_loader, writer_eval):
         y_lengths = y_lengths[:1]
         speakers = speakers[:1]
         break
-      y_hat, attn, mask, *_ = generator.module.infer(x, x_lengths, speakers, max_len=1000)
+      y_hat, attn, mask, *_ = generator.infer(x, x_lengths, speakers, max_len=1000)
       y_hat_lengths = mask.sum([1,2]).long() * hps.data.hop_length
 
       mel = spec_to_mel_torch(
