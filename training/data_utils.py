@@ -11,6 +11,35 @@ from utils import load_wav_to_torch, load_filepaths_and_text
 #from text import text_to_sequence, cleaned_text_to_sequence
 from text.mappers import TextMapper
 
+import pandas as pd
+
+import os
+import torchaudio
+
+def check_audio_file(file_path):
+    try:
+        speech_array, sampling_rate = torchaudio.load(file_path)
+        return {"file_path": file_path, "is_audio_ok": True}
+    except Exception as e:
+        print(f"Could not process file {file_path}. Error: {str(e)}")
+        return {"file_path": file_path, "is_audio_ok": False}
+
+
+def verify_audio_dir(audio_dir, file_extension = ".wav"):
+    results = []
+    for subdir, dirs, files in os.walk(audio_dir):
+        for file_to_check in files:
+            # Check if the file is an audio file (e.g., .wav). Adjust as necessary.
+            if file_to_check.endswith(file_extension):
+                # Full file path
+                file_path = os.path.join(subdir, file_to_check)
+                # Check the file and store the result
+                results.append(check_audio_file(file_path))
+    
+    corrupt_df = pd.DataFrame(results)
+    return corrupt_df
+
+
 class TextAudioLoader(torch.utils.data.Dataset):
     """
         1) loads audio, text pairs

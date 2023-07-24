@@ -33,6 +33,7 @@ from losses import (
 from mel_processing import mel_spectrogram_torch, spec_to_mel_torch
 from text.symbols import symbols
 
+from data_utils import verify_audio_dir
 
 torch.backends.cudnn.benchmark = True
 global_step = 0
@@ -52,6 +53,17 @@ def main():
 
 def run(rank = 0, n_gpus = 1, config= None, device="cpu", g_checkpoint_path = None, d_checkpoint_path = None):
   global global_step
+
+  corrupt_list = verify_audio_dir(config["data_root_dir"], file_extension=".wav")
+
+  try:
+    assert len(corrupt_list) == 0
+  except:
+    print(corrupt_list)
+    raise ValueError("Handle corrupt files first")
+
+
+
   logger = utils.get_logger(config["model_dir"])
   logger.info(config)
   utils.check_git_hash(config["model_dir"])
