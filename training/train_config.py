@@ -6,6 +6,29 @@ config = {
     "multispeaker": True,
     "ckpt_dir": None,
     "device": "cpu",
+    "vertex": {
+        "gcp_project": "sb-gcp-project-01",
+        "bucket_name": "ali_speech_experiments",
+        "gcp_region": "europe-west6",
+        "app_name": "train_tts", #according to //// format
+        "prebuilt_docker_image": "us-docker.pkg.dev/vertex-ai/training/pytorch-gpu.1-7:latest",
+        "package_application_dir":"training",
+        "source_package_file_name": "{}/dist/trainer-0.1.tar.gz", #root_dir same as package_application_dir
+        "python_package_gcs_uri": "{}/pytorch-on-gcp/{}/train/python_package/trainer-0.1.tar.gz", #bucket_name app_name
+        "python_module_name": "training.run" #To run?
+        "requirements": [
+            "Cython==0.29.21",
+            "librosa==0.8.0",
+            "matplotlib==3.3.1",
+            "numpy==1.18.5",
+            "phonemizer==2.2.1",
+            "scipy==1.5.2",
+            #tensorboard==2.3.0
+            "torch==1.6.0",
+            "torchvision==0.7.0",
+            "Unidecode==1.1.1"
+        ]
+        },
     "train": {
         "log_interval": 200,
         "eval_interval": 1000,
