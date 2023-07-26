@@ -12,6 +12,7 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from text.mappers import TextMapper, preprocess_char
+from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob
 
 import commons
 import utils
@@ -54,20 +55,32 @@ def main():
 def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoint_path = None):
   global global_step
 
-  corrupt_list = verify_audio_dir(config["data"]["data_root_dir"], file_extension=".wav")
+  #corrupt_list = verify_audio_dir(config["data"]["data_root_dir"], file_extension=".wav")
 
-  try:
-    assert len(corrupt_list) == 0
-  except:
-    print(corrupt_list)
-    raise ValueError("Handle corrupt files first")
+  # try:
+  #   assert len(corrupt_list) == 0
+  # except:
+  #   print(corrupt_list)
+  #   raise ValueError("Handle corrupt files first")
 
-  if rank == 0:
-    logger = utils.get_logger(config["model_dir"])
-    logger.info(config)
-    utils.check_git_hash(config["model_dir"])
-    # writer = SummaryWriter(log_dir=config["model_dir"])
-    # writer_eval = SummaryWriter(log_dir=os.path.join(config["model_dir"], "eval"))
+  if config["data"]["download"]:
+    for data_source in config["data"]["data_sources"]:
+        if data_source[0] == "gdrive":
+          file_id = data_source[1]
+          download_and_extract_drive_file(file_id,config["data"]["data_root_dir"] )
+        elif data_source[0] == "bucket":
+          bucket_name = data_source[1]
+          blob_name = data_source[2]
+          download_blob(bucket_name,blob_name, config["data"]["data_root_dir"])
+
+  filter_corrupt_files(config["data"]["training_files"], "|")
+  filter_corrupt_files(config["data"]["validation_files"],"|")
+
+  logger = utils.get_logger(config["model_dir"])
+  logger.info(config)
+  utils.check_git_hash(config["model_dir"])
+  # writer = SummaryWriter(log_dir=config["model_dir"])
+  # writer_eval = SummaryWriter(log_dir=os.path.join(config["model_dir"], "eval"))
 
   #dist.init_process_group(backend='nccl', init_method='env://', world_size=n_gpus, rank=rank)
   torch.manual_seed(config["train"]["seed"])
@@ -84,11 +97,11 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
   collate_fn = TextAudioCollate()
   train_loader = DataLoader(train_dataset, num_workers=8, shuffle=False, pin_memory=True,
       collate_fn=collate_fn, batch_sampler=train_sampler)
-  if rank == 0:
-    eval_dataset = TextAudioLoader(config["data"]["validation_files"], config["data"], text_mapper)
-    eval_loader = DataLoader(eval_dataset, num_workers=8, shuffle=False,
-        batch_size=config["train"]["batch_size"], pin_memory=True,
-        drop_last=False, collate_fn=collate_fn)
+
+  eval_dataset = TextAudioLoader(config["data"]["validation_files"], config["data"], text_mapper)
+  eval_loader = DataLoader(eval_dataset, num_workers=8, shuffle=False,
+      batch_size=config["train"]["batch_size"], pin_memory=True,
+      drop_last=False, collate_fn=collate_fn)
 
   net_g = SynthesizerTrn(
       len(symbols),

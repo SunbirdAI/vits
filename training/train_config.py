@@ -6,6 +6,8 @@ config = {
     "multispeaker": True,
     "ckpt_dir": None,
     "device": "cpu",
+    "gcp_access": "secrets/gcp.json",
+    "drive_access": "/path/to/access/json or token",
     "vertex": {
         "gcp_project": "sb-gcp-project-01",
         "bucket_name": "ali_speech_experiments",
@@ -15,9 +17,11 @@ config = {
         "package_application_dir":"training",
         "source_package_file_name": "{}/dist/trainer-0.1.tar.gz", #root_dir same as package_application_dir
         "python_package_gcs_uri": "{}/pytorch-on-gcp/{}/train/python_package/trainer-0.1.tar.gz", #bucket_name app_name
-        "python_module_name": "training.run" #To run?
+        "python_module_name": "training.run", #To run?
         "requirements": [
             "Cython==0.29.21",
+            "gdown",
+            "google-cloud-storage",
             "librosa==0.8.0",
             "matplotlib==3.3.1",
             "numpy==1.18.5",
@@ -47,8 +51,18 @@ config = {
         "c_kl": 1.0
     },
     "data": {
-        "training_files":"training_files/acholi_train_mono.csv",
-        "validation_files":"training_files/acholi_val_n_test_mono.csv",
+        "download": False,
+        "data_sources": [ #Ensure all datasets are in zip files
+            #("gdrive", ), 
+            #("bucket", "speech_collection_bucket/" ,"VALIDATED/acholi-validated.zip")
+            ("bucket", "speech_collection_bucket/" ,"VALIDATED/lugbara-validated.zip")
+            #("bucket", "speech_collection_bucket/" ,"VALIDATED/luganda-validated.zip")
+            #("bucket", "speech_collection_bucket/" ,"VALIDATED/runyankole-validated.zip")
+            #("bucket", "speech_collection_bucket/" ,"VALIDATED/ateso-validated.zip")
+            #("bucket", "speech_collection_bucket/" ,"VALIDATED/english-validated.zip")
+        ],
+        "training_files":"training_files/acholi_multi_train.csv",
+        "validation_files":"training_files/acholi_multi_val_n_test.csv",
         "data_root_dir": "/media/ali/Vault 1/test/vits/",
         "text_cleaners":["transliteration_cleaners"],
         "max_wav_value": 32768.0,

@@ -3,12 +3,13 @@ import os
 import subprocess
 from text.mappers import TextMapper, preprocess_char
 from train import run as train_single
-from train_ms import main as train_multi
+from train_ms import run as train_multi
 import numpy as np
 if config["multispeaker"]:
-    train_single(0, 0,  config, g_checkpoint_path = None, d_checkpoint_path = None)
+    train_multi(0, 0,  config, g_checkpoint_path = None, d_checkpoint_path = None)
 else:
-    train_multi()
+    train_single(0, 0,  config, g_checkpoint_path = None, d_checkpoint_path = None)
+    
 
 
 # vocab_file = f"{ckpt_dir}/vocab.txt"
