@@ -51,7 +51,7 @@ def balance_speakers(csv_file_path, separator, use_median=False, prefix="balance
     balanced_data.to_csv(new_file_path, sep=separator, header=False, index=False)
 
     print(f"Balanced data written to: {new_file_path}")
-
+    return new_file_path
 
 def check_audio_file(batch):
     try:

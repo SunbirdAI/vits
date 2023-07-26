@@ -12,7 +12,7 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from text.mappers import TextMapper, preprocess_char
-from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob
+from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob, balance_speakers
 
 import commons
 import utils
@@ -63,6 +63,7 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
   #   print(corrupt_list)
   #   raise ValueError("Handle corrupt files first")
 
+
   if config["data"]["download"]:
     for data_source in config["data"]["data_sources"]:
         if data_source[0] == "gdrive":
@@ -73,9 +74,12 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
           blob_name = data_source[2]
           download_blob(bucket_name,blob_name, config["data"]["data_root_dir"])
 
+
   filter_corrupt_files(config["data"]["training_files"], "|")
   filter_corrupt_files(config["data"]["validation_files"], "|")
 
+  new_path = balance_speakers(config["data"]["training_files"], "|", use_median=True, prefix="balanced_")
+  config["data"]["training_files"] = new_path
 
   logger = utils.get_logger(config["model_dir"])
   logger.info(config)
