@@ -51,6 +51,7 @@ config = {
         "c_kl": 1.0
     },
     "data": {
+        "balance":True,
         "download": False,
         "data_sources": [ #Ensure all datasets are in zip files
             #("gdrive", ), 
@@ -61,6 +62,8 @@ config = {
             #("bucket", "speech_collection_bucket/" ,"VALIDATED/ateso-validated.zip")
             #("bucket", "speech_collection_bucket/" ,"VALIDATED/english-validated.zip")
         ],
+        "bulild_csv": True,
+        "reference_file":"training_files/Prompt-Luganda.csv",
         "training_files":"training_files/acholi_multi_train.csv",
         "validation_files":"training_files/acholi_multi_val_n_test.csv",
         "data_root_dir": "/media/ali/Vault 1/test/vits/",

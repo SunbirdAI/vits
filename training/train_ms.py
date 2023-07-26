@@ -12,7 +12,8 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from text.mappers import TextMapper, preprocess_char
-from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob, balance_speakers
+from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob, balance_speakers, \
+  create_multispeaker_audio_csv
 
 import commons
 import utils
@@ -55,7 +56,7 @@ def main():
 def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoint_path = None):
   global global_step
 
-  corrupt_list = verify_audio_dir(config["data"]["data_root_dir"], file_extension=".wav")
+  #corrupt_list = verify_audio_dir(config["data"]["data_root_dir"], file_extension=".wav")
 
   # try:
   #   assert len(corrupt_list) == 0
@@ -74,12 +75,16 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
           blob_name = data_source[2]
           download_blob(bucket_name,blob_name, config["data"]["data_root_dir"])
 
+  if config["data"]["build_csv"]:
+    create_multispeaker_audio_csv(config["data"]["data_root_dir"], config["data"]["reference_file"],
+                                  config["data"]["training_files"], config["data"]["validation_files"])
+  else:
+    filter_corrupt_files(config["data"]["training_files"], "|")
+    filter_corrupt_files(config["data"]["validation_files"], "|")
 
-  filter_corrupt_files(config["data"]["training_files"], "|")
-  filter_corrupt_files(config["data"]["validation_files"], "|")
-
-  new_path = balance_speakers(config["data"]["training_files"], "|", use_median=True, prefix="balanced_")
-  config["data"]["training_files"] = new_path
+  if config["data"]["balance"]:
+    new_path = balance_speakers(config["data"]["training_files"], "|", use_median=True, prefix="")
+    config["data"]["training_files"] = new_path
 
   logger = utils.get_logger(config["model_dir"])
   logger.info(config)
@@ -87,7 +92,6 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
   #writer = SummaryWriter(log_dir=config["model_dir"])
   #writer_eval = SummaryWriter(log_dir=os.path.join(config["model_dir"], "eval"))
 
-  
   torch.manual_seed(config["train"]["seed"])
   #torch.cuda.set_device(rank)
   text_mapper = TextMapper(config["model"]["vocab_file"])
