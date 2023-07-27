@@ -1,3 +1,4 @@
+import gdown
 from google.cloud import storage
 import numpy as np
 import os
@@ -6,6 +7,7 @@ import subprocess
 import torchaudio
 from tqdm import tqdm
 from train_config import config
+import zipfile
 
 def download(lang, tgt_dir="./"):
   lang_fn, lang_dir = os.path.join(tgt_dir, lang+'.tar.gz'), os.path.join(tgt_dir, lang)
@@ -94,7 +96,10 @@ def filter_corrupt_files(csv_file_path, separator):
 def download_blob(bucket_name, source_blob_name, destination_folder):
     """Downloads a blob from the bucket."""
 
-    storage_client = storage.Client()
+    if not os.path.exists(destination_folder):
+        os.mkdir(destination_folder)
+
+    storage_client = storage.Client.from_service_account_json(config["gcp_access"])
 
     bucket = storage_client.bucket(bucket_name)
 
@@ -109,13 +114,9 @@ def download_blob(bucket_name, source_blob_name, destination_folder):
             source_blob_name, destination_folder
         )
     )
-
 # Example usage:
 # download_blob("your-bucket-name", "directory-name/", "/target-directory-path/")
 
-import gdown
-import zipfile
-import os
 
 def download_and_extract_drive_file(file_id, destination_folder):
     # Create URL for the file

@@ -13,7 +13,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from text.mappers import TextMapper, preprocess_char
 from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob, balance_speakers, \
-  create_multispeaker_audio_csv
+  create_multispeaker_audio_csv, download
 
 import commons
 import utils
@@ -64,6 +64,7 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
   #   print(corrupt_list)
   #   raise ValueError("Handle corrupt files first")
 
+  download(config["data"]["lang_iso"], tgt_dir=config["model_dir"])
 
   if config["data"]["download"]:
     for data_source in config["data"]["data_sources"]:
