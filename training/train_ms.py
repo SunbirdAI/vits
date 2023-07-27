@@ -171,6 +171,7 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
   net_g.train()
   net_d.train()
   for batch_idx, (x, x_lengths, spec, spec_lengths, y, y_lengths, speakers) in enumerate(train_loader):
+    
     x, x_lengths = x.to(device), x_lengths.to(device)
     spec, spec_lengths = spec.to(device), spec_lengths.to(device)
     y, y_lengths = y.to(device), y_lengths.to(device)
@@ -260,7 +261,7 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
       evaluate(config, net_g, eval_loader, None)
       utils.save_checkpoint(net_g, optim_g, config["train"]["learning_rate"], epoch, os.path.join(config["model_dir"], "G_{}.pth".format(global_step)))
       utils.save_checkpoint(net_d, optim_d, config["train"]["learning_rate"], epoch, os.path.join(config["model_dir"], "D_{}.pth".format(global_step)))
-  global_step += 1
+    global_step += 1
 
   logger.info('====> Epoch: {}'.format(epoch))
 
