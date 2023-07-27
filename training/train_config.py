@@ -1,12 +1,10 @@
 config = {
-    #"training_csv": "acholi_solomon_train.csv",
-    #"val_csv": "acholi_solomon_val.csv",
-    #"test_csv": "acholi_solomon_test.csv",
     "model_dir": "best",
     "multispeaker": True,
+    "mms_checkpoint": False,
     "ckpt_dir": None,
     "device": "cpu",
-    "gcp_access": "secrets/gcp.json",
+    "gcp_access": "/content/vits/training/secrets/srvc_acct.json",
     "drive_access": "/path/to/access/json or token",
     "vertex": {
         "gcp_project": "sb-gcp-project-01",
@@ -41,7 +39,7 @@ config = {
         "learning_rate": 2e-4,
         "betas": [0.8, 0.99],
         "eps": 1e-9,
-        "batch_size": 64,
+        "batch_size": 1,
         "fp16_run": True,
         "lr_decay": 0.999875,
         "segment_size": 8192,
@@ -51,26 +49,29 @@ config = {
         "c_kl": 1.0
     },
     "data": {
-        "balance":True,
+        "balance":False,
         "download": False,
+        "ogg_to_wav":True,
+        "build_csv": True,
         "data_sources": [ #Ensure all datasets are in zip files
             #("gdrive", ), 
-            #("bucket", "speech_collection_bucket/" ,"VALIDATED/acholi-validated.zip")
-            ("bucket", "speech_collection_bucket/" ,"VALIDATED/lugbara-validated.zip")
-            #("bucket", "speech_collection_bucket/" ,"VALIDATED/luganda-validated.zip")
-            #("bucket", "speech_collection_bucket/" ,"VALIDATED/runyankole-validated.zip")
-            #("bucket", "speech_collection_bucket/" ,"VALIDATED/ateso-validated.zip")
-            #("bucket", "speech_collection_bucket/" ,"VALIDATED/english-validated.zip")
+            #("bucket", "speech_collection_bucket" ,"VALIDATED/acholi-validated.zip")
+            ("bucket", "speech_collection_bucket" ,"VALIDATED/lugbara-validated.zip")
+            #("bucket", "speech_collection_bucket" ,"VALIDATED/luganda-validated.zip")
+            #("bucket", "speech_collection_bucket" ,"VALIDATED/runyankole-validated.zip")
+            #("bucket", "speech_collection_bucket" ,"VALIDATED/ateso-validated.zip")
+            #("bucket", "speech_collection_bucket" ,"VALIDATED/english-validated.zip")
         ],
         "bulild_csv": True,
+        "language": "language",
         "lang_iso": "lug",
-        "reference_file":"training_files/Prompt-Luganda.csv",
-        "training_files":"training_files/acholi_multi_train.csv",
-        "validation_files":"training_files/acholi_multi_val_n_test.csv",
-        "data_root_dir": "/media/ali/Vault 1/test/vits/",
+        "reference_file":"/content/vits/training/training_files/Prompt-Luganda.csv",
+        "training_files":"/content/vits/training/training_files/acholi_multi_train.csv",
+        "validation_files":"/content/vits/training/training_files/acholi_multi_val_n_test.csv",
+        "data_root_dir": "/content/vits/training/dataset",
         "text_cleaners":["transliteration_cleaners"],
         "max_wav_value": 32768.0,
-        "sampling_rate": 24000,
+        "sampling_rate": 16000,
         "filter_length": 1024,
         "hop_length": 256,
         "win_length": 1024,
@@ -82,7 +83,7 @@ config = {
         "cleaned_text": True
     },
     "model": {
-        "vocab_file": "/media/ali/Vault 1/test/vits/ach/vocab.txt",
+        "vocab_file": "/content/lug/vocab.txt",
         "inter_channels": 192,
         "hidden_channels": 192,
         "filter_channels": 768,

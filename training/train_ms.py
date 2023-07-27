@@ -13,7 +13,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from text.mappers import TextMapper, preprocess_char
 from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob, balance_speakers, \
-  create_multispeaker_audio_csv, download
+  create_multispeaker_audio_csv, download, convert_and_resample
 
 import commons
 import utils
@@ -76,6 +76,9 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
           bucket_name = data_source[1]
           blob_name = data_source[2]
           download_blob(bucket_name,blob_name, config["data"]["data_root_dir"])
+
+  if config["data"]["ogg_to_wav"]:
+    convert_and_resample(os.path.join(config["data"]["data_root_dir"], f"{config['data']['language']}-validated"), config["data"]["sampling_rate"])
 
   if config["data"]["build_csv"]:
     create_multispeaker_audio_csv(config["data"]["data_root_dir"], config["data"]["reference_file"],
