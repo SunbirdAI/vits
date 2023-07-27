@@ -184,13 +184,13 @@ def create_multispeaker_audio_csv(root_dir, text_csv, train_csv = None, val_test
                     except KeyError:
                         speaker_ids[file] = len(speaker_ids)
                         sid = speaker_ids[file]
-                    #file_path = os.path.join(subdir, file)
+                    file_path = os.path.join(subdir, file).replace(config["data"]["data_root_dir"] + "/")
 
                     # Append the path, key and associated text to our data
                     if df.iloc[key]["split"] == "train": 
-                      train_data.append([file, sid, text_dict[key]])
+                      train_data.append([file_path, sid, text_dict[key]])
                     else:
-                      val_data.append([file, sid, text_dict[key]])
+                      val_data.append([file_path, sid, text_dict[key]])
     # Create a dataframe from the data
     train_df_audio = pd.DataFrame(train_data, columns=['Path', 'SID', 'Text'])
     val_df_audio = pd.DataFrame(val_data, columns=['Path', 'SID', 'Text'])
