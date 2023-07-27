@@ -7,8 +7,11 @@ import subprocess
 import torchaudio
 from tqdm import tqdm
 from train_config import config
-import zipfile
-
+from zipfile import ZipFile
+import os
+from pydub import AudioSegment
+import librosa
+import soundfile as sf
 
 def download(lang, tgt_dir="./"):
   
@@ -113,7 +116,13 @@ def download_blob(bucket_name, source_blob_name, destination_folder):
 
     for blob in blobs:
         filename = blob.name.replace('/', '_') # replace slashes with underscores
-        blob.download_to_filename(destination_folder + filename) # download the file to a destination folder
+        file_path = os.path.join(destination_folder, filename)
+        blob.download_to_filename(file_path) # download the file to a destination folder
+
+    if filename.endswith('.zip'):
+            # Unzip the file
+            with ZipFile(file_path, 'r') as zip_ref:
+                zip_ref.extractall(destination_folder)
 
     print(
         "Blob {} downloaded to {}.".format(
@@ -133,7 +142,7 @@ def download_and_extract_drive_file(file_id, destination_folder):
     gdown.download(url, output_path, quiet=False)
 
     # Open and extract the zip file
-    with zipfile.ZipFile(output_path, 'r') as zip_ref:
+    with ZipFile(output_path, 'r') as zip_ref:
         zip_ref.extractall(destination_folder)
 
     # Remove the zip file after extraction
@@ -168,7 +177,7 @@ def create_multispeaker_audio_csv(root_dir, text_csv, train_csv = None, val_test
         if key in text_dict:
             for file in files:
                 # Check if the file is an audio file
-                if file.endswith(".ogg"):
+                if file.endswith(".wav"):
                     # Full path to the file
                     try:
                         sid = speaker_ids[file]
@@ -195,3 +204,21 @@ def create_multispeaker_audio_csv(root_dir, text_csv, train_csv = None, val_test
 # construct_csv('samples_acholi', 'text.csv', 'output.csv')
 
 
+
+
+def convert_and_resample(directory, sample_rate):
+    for subdir, dirs, files in os.walk(directory):
+        for file in files:
+            # Check if the file is an ogg file
+            if file.endswith(".ogg"):
+                file_path = os.path.join(subdir, file)
+                # Convert ogg to wav using pydub
+                audio = AudioSegment.from_ogg(file_path)
+                wav_path = file_path.replace(".ogg", ".wav")
+                audio.export(wav_path, format="wav")
+
+                # Resample the audio file using librosa
+                y, sr = librosa.load(wav_path, sr=None)
+                y_resampled = librosa.resample(y, sr, sample_rate)
+                # Overwrite the original wav file with resampled wav file
+                sf.write(wav_path, y_resampled, sample_rate)
