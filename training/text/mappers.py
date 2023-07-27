@@ -19,7 +19,7 @@ from models import SynthesizerTrn
 from scipy.io.wavfile import write
 from text import cleaners
 
-def utf_8(x = None):
+def utf_8(x = None, *args):
     return "UTF-8"
 locale.getpreferredencoding = utf_8
 
