@@ -9,7 +9,12 @@ from tqdm import tqdm
 from train_config import config
 import zipfile
 
+
 def download(lang, tgt_dir="./"):
+  
+  if not os.path.exists(tgt_dir):
+    os.mkdir(tgt_dir)
+
   lang_fn, lang_dir = os.path.join(tgt_dir, lang+'.tar.gz'), os.path.join(tgt_dir, lang)
   cmd = ";".join([
         f"wget https://dl.fbaipublicfiles.com/mms/tts/full_model/{lang}.tar.gz -O {lang_fn}",
@@ -20,8 +25,9 @@ def download(lang, tgt_dir="./"):
     return lang_dir
 
   subprocess.check_output(cmd, shell=True)
-  print(f"Model checkpoints in {lang_dir}: {os.listdir(lang_dir)}")
-  return lang_dir
+  
+  print(f"Model checkpoints in {lang_dir}: {os.listdir(lang)}")
+  return lang
 
 
 def balance_speakers(csv_file_path, separator, use_median=False, prefix="balanced_"):

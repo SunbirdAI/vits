@@ -63,6 +63,7 @@ config = {
             #("bucket", "speech_collection_bucket/" ,"VALIDATED/english-validated.zip")
         ],
         "bulild_csv": True,
+        "lang_iso": "lug",
         "reference_file":"training_files/Prompt-Luganda.csv",
         "training_files":"training_files/acholi_multi_train.csv",
         "validation_files":"training_files/acholi_multi_val_n_test.csv",

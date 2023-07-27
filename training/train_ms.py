@@ -64,6 +64,7 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
   #   print(corrupt_list)
   #   raise ValueError("Handle corrupt files first")
 
+  
   download(config["data"]["lang_iso"], tgt_dir=config["model_dir"])
 
   if config["data"]["download"]:
