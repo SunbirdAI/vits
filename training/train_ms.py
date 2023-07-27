@@ -78,6 +78,7 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
           download_blob(bucket_name,blob_name, config["data"]["data_root_dir"])
 
   if config["data"]["ogg_to_wav"]:
+    print(os.path.join(config["data"]["data_root_dir"], f"{config['data']['language']}-validated"))
     convert_and_resample(os.path.join(config["data"]["data_root_dir"], f"{config['data']['language']}-validated"), config["data"]["sampling_rate"])
 
   if config["data"]["build_csv"]:
