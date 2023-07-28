@@ -207,15 +207,18 @@ def create_multispeaker_audio_csv(root_dir, text_csv, train_csv = None, val_test
 
 
 def convert_and_resample(directory, sample_rate):
-    for subdir, dirs, files in os.walk(directory):
+    for subdir, dirs, files in tqdm(os.walk(directory)):
         for file in files:
             # Check if the file is an ogg file
             if file.endswith(".ogg"):
                 file_path = os.path.join(subdir, file)
                 # Convert ogg to wav using pydub
-                audio = AudioSegment.from_ogg(file_path)
-                wav_path = file_path.replace(".ogg", ".wav")
-                audio.export(wav_path, format="wav")
+                try:
+                    audio = AudioSegment.from_ogg(file_path)
+                    wav_path = file_path.replace(".ogg", ".wav")
+                    audio.export(wav_path, format="wav")
+                except:
+                    continue
 
                 # Resample the audio file using librosa
                 y, sr = librosa.load(wav_path, sr=None)
