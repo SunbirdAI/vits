@@ -173,7 +173,9 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
   global global_step
 
   net_g.train()
+  net_g.to(device)
   net_d.train()
+  net_d.to(device)
   for batch_idx, (x, x_lengths, spec, spec_lengths, y, y_lengths, speakers) in enumerate(train_loader):
     
     x, x_lengths = x.to(device), x_lengths.to(device)
