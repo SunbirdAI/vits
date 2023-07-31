@@ -65,7 +65,7 @@ def acholi_add(text):
   return text
 
 def luganda_add(text):
-  text = re.sub(r'[!?:/\[\]\,\.@;#$%^&*]', ' ', text)
+  text = re.sub(r'[!?x:/\[\]\,\.@;#$%^&*]', ' ', text)
   return text
 
 
