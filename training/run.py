@@ -6,9 +6,9 @@ from train import run as train_single
 from train_ms import run as train_multi
 import numpy as np
 if config["multispeaker"]:
-    train_multi(0, 0,  config, g_checkpoint_path = None, d_checkpoint_path = None)
+    train_multi(0, 0,  config, g_checkpoint_path = config["g_checkpoint_path"], d_checkpoint_path = config["d_checkpoint_path"])
 else:
-    train_single(0, 0,  config, g_checkpoint_path = None, d_checkpoint_path = None)
+    train_single(0, 0,  config, g_checkpoint_path = config["g_checkpoint_path"], d_checkpoint_path = config["d_checkpoint_path"])
     
 
 

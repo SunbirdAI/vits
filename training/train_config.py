@@ -4,7 +4,7 @@ config = {
     "mms_checkpoint": False,
     "ckpt_dir": None,
     "device": "cpu",
-    "gcp_access": "/content/vits/training/secrets/srvc_acct.json",
+    "gcp_access": "secrets/srvc_acct.json",
     "drive_access": "/path/to/access/json or token",
     "vertex": {
         "gcp_project": "sb-gcp-project-01",
@@ -54,10 +54,10 @@ config = {
         "ogg_to_wav":True,
         "build_csv": True,
         "data_sources": [ #Ensure all datasets are in zip files
-            #("gdrive", ), 
+            #("gdrive", ),
             #("bucket", "speech_collection_bucket" ,"VALIDATED/acholi-validated.zip")
-            ("bucket", "speech_collection_bucket" ,"VALIDATED/lugbara-validated.zip")
-            #("bucket", "speech_collection_bucket" ,"VALIDATED/luganda-validated.zip")
+            #("bucket", "speech_collection_bucket" ,"VALIDATED/lugbara-validated.zip")
+            ("bucket", "speech_collection_bucket" ,"VALIDATED/luganda-validated.zip")
             #("bucket", "speech_collection_bucket" ,"VALIDATED/runyankole-validated.zip")
             #("bucket", "speech_collection_bucket" ,"VALIDATED/ateso-validated.zip")
             #("bucket", "speech_collection_bucket" ,"VALIDATED/english-validated.zip")
@@ -65,10 +65,11 @@ config = {
         "bulild_csv": True,
         "language": "language",
         "lang_iso": "lug",
-        "reference_file":"/content/vits/training/training_files/Prompt-Luganda.csv",
-        "training_files":"/content/vits/training/training_files/acholi_multi_train.csv",
-        "validation_files":"/content/vits/training/training_files/acholi_multi_val_n_test.csv",
-        "data_root_dir": "/content/vits/training/dataset",
+        "reference_file":"training_files/Prompt-Luganda.csv",
+        "training_files":"training_files/acholi_multi_train.csv",
+        "validation_files":"training_files/acholi_multi_val_n_test.csv",
+        "data_root_dir": "dataset",
+        "dataset_dir": "dataset/luganda-validated", 
         "text_cleaners":["transliteration_cleaners"],
         "max_wav_value": 32768.0,
         "sampling_rate": 16000,
@@ -83,7 +84,9 @@ config = {
         "cleaned_text": True
     },
     "model": {
-        "vocab_file": "/content/lug/vocab.txt",
+        "vocab_file": "lug/vocab.txt",
+        "g_checkpoint_path": "/path/to/checkpoint",#
+        "d_checkpoint_path": "/path/to/checkpoint",
         "inter_channels": 192,
         "hidden_channels": 192,
         "filter_channels": 768,
