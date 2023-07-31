@@ -64,6 +64,11 @@ def acholi_add(text):
   text = re.sub(r'[!?xz/\[\]\,\.@;#$%^&*]', ' ', text)
   return text
 
+def luganda_add(text):
+  text = re.sub(r'[!?:/\[\]\,\.@;#$%^&*]', ' ', text)
+  return text
+
+
 def convert_to_ascii(text):
   return unidecode(text)
 
@@ -79,6 +84,14 @@ def transliteration_cleaners(text):
   '''Pipeline for non-English text that transliterates to ASCII.'''
   text = lowercase(text)
   text = acholi_add(text)
+  text = convert_to_ascii(text)
+  text = collapse_whitespace(text)
+  return text
+
+def luganda_cleaners(text):
+  '''Pipeline for non-English text that transliterates to ASCII.'''
+  text = lowercase(text)
+  text = luganda_add(text)
   text = convert_to_ascii(text)
   text = collapse_whitespace(text)
   return text
