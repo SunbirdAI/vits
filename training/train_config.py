@@ -62,7 +62,7 @@ config = {
             #("bucket", "speech_collection_bucket" ,"VALIDATED/ateso-validated.zip")
             #("bucket", "speech_collection_bucket" ,"VALIDATED/english-validated.zip")
         ],
-        "bulild_csv": True,
+        "build_csv": True,
         "language": "language",
         "lang_iso": "lug",
         "reference_file":"training_files/Prompt-Luganda.csv",
