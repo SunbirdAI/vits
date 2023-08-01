@@ -245,6 +245,10 @@ def find_non_allowed_characters(files_list, vocab, multispeaker = True):
             file_df = pd.read_csv(file_path, sep="|", names=["path", "transcription"],index_col=False)           
         for trasncription in file_df["transcription"]:
             for character in trasncription:
+                try:
+                    character = character.lower()
+                except:
+                    pass
                 characters_set.add(character)
     vocab_set = set(vocab)
     return characters_set - vocab_set #Shows what are not part of the vocab file
