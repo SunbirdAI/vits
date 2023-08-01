@@ -69,7 +69,7 @@ def luganda_add(text):
   return text
 
 def custom_add(text, regex):
-  text = re.sub(regex, text)
+  text = re.sub(regex, ' ', text)
   return text
 
 def convert_to_ascii(text):
