@@ -51,8 +51,8 @@ config = {
     "data": {
         "balance":False,
         "download": False,
-        "ogg_to_wav":True,
-        "build_csv": True,
+        "ogg_to_wav":False,
+        "build_csv": False,
         "data_sources": [ #Ensure all datasets are in zip files
             #("gdrive", ),
             #("bucket", "speech_collection_bucket" ,"VALIDATED/acholi-validated.zip")
@@ -62,12 +62,11 @@ config = {
             #("bucket", "speech_collection_bucket" ,"VALIDATED/ateso-validated.zip")
             #("bucket", "speech_collection_bucket" ,"VALIDATED/english-validated.zip")
         ],
-        "build_csv": True,
         "language": "language",
         "lang_iso": "lug",
         "reference_file":"training_files/Prompt-Luganda.csv",
         "training_files":"training_files/acholi_multi_train.csv",
-        "validation_files":"training_files/acholi_multi_val_n_test.csv",
+        "validation_files":"training_files/acholi_multi_train.csv",
         "data_root_dir": "dataset",
         "dataset_dir": "dataset/luganda-validated", 
         "text_cleaners":["custom_cleaners"],

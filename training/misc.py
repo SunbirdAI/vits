@@ -240,11 +240,10 @@ def find_non_allowed_characters(files_list, vocab, multispeaker = True):
     characters_set = set()
     for file_path in files_list:
         if multispeaker:
-            file_df = pd.read_csv(file_path, sep="|", names=["path", "transcription"])
+            file_df = pd.read_csv(file_path, sep="|", names=["path","speaker", "transcription"], index_col=False)
         else:
-            file_df = pd.read_csv(file_path, sep="|", names=["path", "speaker", "transcription"])           
-        for row in file_df:
-            trasncription = row["transcription"]
+            file_df = pd.read_csv(file_path, sep="|", names=["path", "transcription"],index_col=False)           
+        for trasncription in file_df["transcription"]:
             for character in trasncription:
                 characters_set.add(character)
     vocab_set = set(vocab)
