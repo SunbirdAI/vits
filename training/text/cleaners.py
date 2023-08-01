@@ -69,6 +69,7 @@ def luganda_add(text):
   return text
 
 def custom_add(text, regex):
+  regex = r"[" + regex + r"]"
   text = re.sub(regex, ' ', text)
   return text
 
