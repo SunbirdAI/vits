@@ -11,6 +11,7 @@ from zipfile import ZipFile
 import os
 from pydub import AudioSegment
 import librosa
+import re
 import soundfile as sf
 
 def download(lang, tgt_dir="./"):
@@ -225,3 +226,35 @@ def convert_and_resample(directory, sample_rate):
                 y_resampled = librosa.resample(y, sr, sample_rate)
                 # Overwrite the original wav file with resampled wav file
                 sf.write(wav_path, y_resampled, sample_rate)
+
+
+# def _open_vocab(vocab_path):
+#     char_set = set()
+#     with open(vocab_path, "r") as vfd:
+#         for char in vfd.readlines():
+#             char_set.add(char)
+#     return char_set
+
+
+def find_non_allowed_characters(files_list, vocab, multispeaker = True):
+    characters_set = set()
+    for file_path in files_list:
+        if multispeaker:
+            file_df = pd.read_csv(file_path, sep="|", names=["path", "transcription"])
+        else:
+            file_df = pd.read_csv(file_path, sep="|", names=["path", "speaker", "transcription"])           
+        for row in file_df:
+            trasncription = row["transcription"]
+            for character in trasncription:
+                characters_set.add(character)
+    vocab_set = set(vocab)
+    return characters_set - vocab_set #Shows what are not part of the vocab file
+
+def create_regex_for_character_list(character_list):
+    # Escape each character in the list to handle special characters in the regex pattern.
+    escaped_characters = [re.escape(char) for char in character_list]
+    
+    # Concatenate the escaped characters with the '|' (OR) operator to form the regex pattern.
+    regex_pattern = r''.join(escaped_characters)
+    
+    return regex_pattern
