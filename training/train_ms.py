@@ -13,7 +13,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from text.mappers import TextMapper, preprocess_char
 from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob, balance_speakers, \
-  create_multispeaker_audio_csv, download, convert_and_resample, find_non_allowed_characters
+  create_multispeaker_audio_csv, download, convert_and_resample, find_non_allowed_characters, create_regex_for_character_list
 
 import commons
 import utils
@@ -101,8 +101,11 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
   torch.manual_seed(config["train"]["seed"])
   #torch.cuda.set_device(rank)
   text_mapper = TextMapper(config["model"]["vocab_file"])
-  non_allowed_chars = find_non_allowed_characters([config["data"]["training_files"]], text_mapper.symbols, config["multispeaker"])
-  config["cleaner_characters"] = non_allowed_chars
+  if config["data"]["custom_cleaner_regex"] is None:
+    non_allowed_chars = find_non_allowed_characters([config["data"]["training_files"]], text_mapper.symbols, config["multispeaker"])
+    print(create_regex_for_character_list(non_allowed_chars))
+    return
+  
   train_dataset = TextAudioSpeakerLoader(config["data"]["training_files"], config["data"], text_mapper)
   train_sampler = DistributedBucketSampler(
       train_dataset,
