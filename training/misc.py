@@ -68,6 +68,8 @@ def balance_speakers(csv_file_path, separator, use_median=False, prefix="balance
 def check_audio_file(batch):
     try:
         speech_array, sampling_rate = torchaudio.load(batch["path"])
+        if len(speech_array) == 0:
+            raise ValueError
         return {"is_audio_ok": True}
     except Exception as e:
         print(f"Could not process file {batch['path']}. Error: {str(e)}")
