@@ -154,8 +154,8 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
     epoch_str = 1
     global_step = 0
 
-  scheduler_g = torch.optim.lr_scheduler.ExponentialLR(optim_g, gamma=config["train"]["lr_decay"], last_epoch=0)
-  scheduler_d = torch.optim.lr_scheduler.ExponentialLR(optim_d, gamma=config["train"]["lr_decay"], last_epoch=0)
+  scheduler_g = torch.optim.lr_scheduler.ExponentialLR(optim_g, gamma=config["train"]["lr_decay"], last_epoch=None)
+  scheduler_d = torch.optim.lr_scheduler.ExponentialLR(optim_d, gamma=config["train"]["lr_decay"], last_epoch=None)
 
   scaler = GradScaler(enabled=config["train"]["fp16_run"])
 
