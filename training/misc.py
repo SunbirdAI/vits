@@ -13,6 +13,7 @@ from pydub import AudioSegment
 import librosa
 import re
 import soundfile as sf
+import torch
 
 def download(lang, tgt_dir="./"):
   
@@ -263,3 +264,9 @@ def create_regex_for_character_list(character_list):
     regex_pattern = r''.join(escaped_characters)
     
     return regex_pattern
+
+# Function to check if tensor has any NaN values
+def check_nan(tensor, name):
+    if torch.isnan(tensor).any():
+        print(f"Found NaN in {name}")
+

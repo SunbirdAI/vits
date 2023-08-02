@@ -13,7 +13,8 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from text.mappers import TextMapper, preprocess_char
 from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob, balance_speakers, \
-  create_multispeaker_audio_csv, download, convert_and_resample, find_non_allowed_characters, create_regex_for_character_list
+  create_multispeaker_audio_csv, download, convert_and_resample, find_non_allowed_characters, create_regex_for_character_list, \
+  check_nan
 
 import commons
 import utils
@@ -192,6 +193,15 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
     spec, spec_lengths = spec.to(device), spec_lengths.to(device)
     y, y_lengths = y.to(device), y_lengths.to(device)
     speakers = speakers.to(device)
+
+    check_nan(x, "x")
+    check_nan(x_lengths, "x_lengths")
+    check_nan(spec, "spec")
+    check_nan(spec_lengths, "spec_lengths")
+    check_nan(y, "y")
+    check_nan(y_lengths, "y_lengths")
+    check_nan(speakers, "speakers")
+
 
     with autocast(enabled=config["train"]["fp16_run"]):
       y_hat, l_length, attn, ids_slice, x_mask, z_mask,\
