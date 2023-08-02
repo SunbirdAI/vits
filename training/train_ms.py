@@ -146,7 +146,9 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
   try:
     _, _, _, epoch_str = utils.load_checkpoint(g_checkpoint_path, net_g, None)
     _, _, _, epoch_str = utils.load_checkpoint(d_checkpoint_path, net_d, None)
-    global_step = (epoch_str - 1) * len(train_loader)
+    #global_step = (epoch_str - 1) * len(train_loader)
+    epoch_str = 1
+    global_step = 0
     logger.info("Loaded checkpoint successfully")
   except Exception as e:
     logger.info("Failed to load checkpoint" + f"G_checkpoint: {g_checkpoint_path}" + " " + f"D_checkpoint: {d_checkpoint_path}")
