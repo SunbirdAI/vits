@@ -266,7 +266,8 @@ def create_regex_for_character_list(character_list):
     return regex_pattern
 
 # Function to check if tensor has any NaN values
-def check_nan(tensor, name):
+def check_nan(tensor, name, logger):
     if torch.isnan(tensor).any():
-        print(f"Found NaN in {name}")
+        logger.info(f"Found NaN in {name}")
+        raise ValueError
 

@@ -194,13 +194,13 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
     y, y_lengths = y.to(device), y_lengths.to(device)
     speakers = speakers.to(device)
 
-    check_nan(x, "x")
-    check_nan(x_lengths, "x_lengths")
-    check_nan(spec, "spec")
-    check_nan(spec_lengths, "spec_lengths")
-    check_nan(y, "y")
-    check_nan(y_lengths, "y_lengths")
-    check_nan(speakers, "speakers")
+    check_nan(x, "x", logger)
+    check_nan(x_lengths, "x_lengths", logger)
+    check_nan(spec, "spec", logger)
+    check_nan(spec_lengths, "spec_lengths", logger)
+    check_nan(y, "y", logger)
+    check_nan(y_lengths, "y_lengths", logger)
+    check_nan(speakers, "speakers", logger)
 
 
     with autocast(enabled=config["train"]["fp16_run"]):
@@ -226,6 +226,9 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
           config["data"]["mel_fmax"]
       )
 
+      check_nan(y_hat, "y_hat",logger)
+      check_nan(l_length, "l_length",logger)
+      check_nan(attn, "attn",logger)
       y = commons.slice_segments(y, ids_slice * config["data"]["hop_length"], config["train"]["segment_size"]) # slice 
 
       # Discriminator
@@ -250,6 +253,13 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
         loss_fm = feature_loss(fmap_r, fmap_g)
         loss_gen, losses_gen = generator_loss(y_d_hat_g)
         loss_gen_all = loss_gen + loss_fm + loss_mel + loss_dur + loss_kl
+    check_nan(loss_disc, "loss_disc",logger)
+    check_nan(loss_gen, "loss_gen",logger)
+    check_nan(loss_fm, "loss_fm",logger)
+    check_nan(loss_mel, "loss_mel",logger)
+    check_nan(loss_dur, "loss_dur",logger)
+    check_nan(loss_kl, "loss_kl",logger)
+
     optim_g.zero_grad()
     scaler.scale(loss_gen_all).backward()
     scaler.unscale_(optim_g)
