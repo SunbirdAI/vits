@@ -149,6 +149,7 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
     global_step = (epoch_str - 1) * len(train_loader)
     print("Loaded checkpoint successfully")
   except:
+    print("Failed to load checkpoint" + f"{g_checkpoint_path}" + " " + f"{d_checkpoint_path}")
     epoch_str = 1
     global_step = 0
 
