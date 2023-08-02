@@ -253,6 +253,15 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
         loss_fm = feature_loss(fmap_r, fmap_g)
         loss_gen, losses_gen = generator_loss(y_d_hat_g)
         loss_gen_all = loss_gen + loss_fm + loss_mel + loss_dur + loss_kl
+    
+    check_nan(z_p, "z_p",logger)
+    check_nan(logs_q, "logs_q",logger)
+    check_nan(m_p, "m_p",logger)
+    check_nan(logs_p, "logs_p",logger)
+    check_nan(z_mask, "z_mask",logger)
+
+    
+    
     check_nan(loss_disc, "loss_disc",logger)
     check_nan(loss_gen, "loss_gen",logger)
     check_nan(loss_fm, "loss_fm",logger)
