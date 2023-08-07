@@ -226,6 +226,9 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
           config["data"]["mel_fmax"]
       )
 
+      check_nan(mel, "mel",logger)
+      check_nan(y_mel, "y_mel",logger)
+      check_nan(y_hat_mel, "y_hat_mel",logger)
       check_nan(y_hat, "y_hat",logger)
       check_nan(l_length, "l_length",logger)
       check_nan(attn, "attn",logger)
