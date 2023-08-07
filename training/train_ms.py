@@ -223,7 +223,8 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
           config["data"]["hop_length"], 
           config["data"]["win_length"], 
           config["data"]["mel_fmin"], 
-          config["data"]["mel_fmax"]
+          config["data"]["mel_fmax"],
+          logger = logger
       )
 
       check_nan(mel, "mel",logger)
