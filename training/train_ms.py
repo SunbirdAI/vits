@@ -254,6 +254,7 @@ def train_and_evaluate(config, epoch, hps, nets, optims, schedulers, scaler, loa
         loss_gen, losses_gen = generator_loss(y_d_hat_g)
         loss_gen_all = loss_gen + loss_fm + loss_mel + loss_dur + loss_kl
     
+    check_nan(y, "y",logger)
     check_nan(z_p, "z_p",logger)
     check_nan(logs_q, "logs_q",logger)
     check_nan(m_p, "m_p",logger)
