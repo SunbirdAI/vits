@@ -12,7 +12,9 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from text.mappers import TextMapper, preprocess_char
-from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob
+from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob, balance_speakers, \
+  create_multispeaker_audio_csv, download, convert_and_resample, find_non_allowed_characters, create_regex_for_character_list, \
+  check_nan
 
 import commons
 import utils
@@ -73,8 +75,20 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
           blob_name = data_source[2]
           download_blob(bucket_name,blob_name, config["data"]["data_root_dir"])
 
-  filter_corrupt_files(config["data"]["training_files"], "|")
-  filter_corrupt_files(config["data"]["validation_files"],"|")
+  if config["data"]["ogg_to_wav"]:
+    print(os.path.join(config["data"]["data_root_dir"], f"{config['data']['language']}-validated"))
+    convert_and_resample(os.path.join(config["data"]["data_root_dir"], f"{config['data']['language']}-validated"), config["data"]["sampling_rate"])
+
+  if config["data"]["build_csv"]:
+    create_multispeaker_audio_csv(config["data"]["data_root_dir"], config["data"]["reference_file"],
+                                  config["data"]["training_files"], config["data"]["validation_files"])
+  else:
+    filter_corrupt_files(config["data"]["training_files"], "|")
+    filter_corrupt_files(config["data"]["validation_files"], "|")
+
+  if config["data"]["balance"]:
+    new_path = balance_speakers(config["data"]["training_files"], "|", use_median=True, prefix="")
+    config["data"]["training_files"] = new_path
 
   logger = utils.get_logger(config["model_dir"])
   logger.info(config)
@@ -86,6 +100,11 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
   torch.manual_seed(config["train"]["seed"])
   #torch.cuda.set_device(rank)
   text_mapper = TextMapper(config["model"]["vocab_file"])
+  if config["data"]["custom_cleaner_regex"] is None:
+    non_allowed_chars = find_non_allowed_characters([config["data"]["training_files"]], text_mapper.symbols, config["multispeaker"])
+    print(create_regex_for_character_list(non_allowed_chars))
+    return
+
   train_dataset = TextAudioLoader(config["data"]["training_files"], config["data"],text_mapper )
   train_sampler = DistributedBucketSampler(
       train_dataset,

@@ -207,6 +207,55 @@ def create_multispeaker_audio_csv(root_dir, text_csv, train_csv = None, val_test
 # Usage:
 # construct_csv('samples_acholi', 'text.csv', 'output.csv')
 
+def create_singlespeaker_audio_csv(root_dir, text_csv, train_csv = None, val_test_csv = None):
+    # Read CSV into dataframe
+    df = pd.read_csv(text_csv)
+
+    # Preprocess CSV file to map index (Key) to Text
+    text_dict = df.set_index('Key')['Text'].to_dict()
+    # Create an empty list to store the data
+    train_data = []
+    val_data = []
+    speaker_ids = {}
+    # Walk through the directory
+    for subdir, dirs, files in os.walk(root_dir):
+        # Use the name of the subfolder as an index to the CSV
+        try:
+            key = int(os.path.basename(subdir))
+        except ValueError:
+            key = None
+            
+        
+        # If the key exists in our CSV
+        if key in text_dict:
+            for file in files:
+                # Check if the file is an audio file
+                if file.endswith(".wav"):
+                    # Full path to the file
+                    try:
+                        sid = speaker_ids[file]
+                    except KeyError:
+                        speaker_ids[file] = len(speaker_ids)
+                        sid = speaker_ids[file]
+                    file_path = os.path.join(subdir, file).replace(config["data"]["data_root_dir"] + "/","")
+
+                    # Append the path, key and associated text to our data
+                    if df.iloc[key]["split"] == "train": 
+                      train_data.append([file_path, sid, text_dict[key]])
+                    else:
+                      val_data.append([file_path, sid, text_dict[key]])
+    # Create a dataframe from the data
+    train_df_audio = pd.DataFrame(train_data, columns=['Path', 'SID', 'Text'])
+    val_df_audio = pd.DataFrame(val_data, columns=['Path', 'SID', 'Text'])
+
+    # Save it to a CSV file
+    train_df_audio.to_csv(train_csv, sep='|', index=False, header=None)
+    val_df_audio.to_csv(val_test_csv, sep='|', index=False, header=None)
+
+
+# Usage:
+# construct_csv('samples_acholi', 'text.csv', 'output.csv')
+
 
 
 
