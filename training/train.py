@@ -123,7 +123,7 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
       drop_last=False, collate_fn=collate_fn)
 
   net_g = SynthesizerTrn(
-      len(symbols),
+      len(text_mapper.symbols),
       config["data"]["filter_length"] // 2 + 1,
       config["train"]["segment_size"] // config["data"]["hop_length"],
       **config["model"]).to(device)
