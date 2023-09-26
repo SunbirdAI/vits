@@ -193,9 +193,9 @@ def create_multispeaker_audio_csv(root_dir, text_csv, train_csv = None, val_test
                     # Append the path, key and associated text to our data
                     try:
                         if df.iloc[key]["split"] == "train": 
-                        train_data.append([file_path, sid, text_dict[key]])
+                            train_data.append([file_path, sid, text_dict[key]])
                         else:
-                        val_data.append([file_path, sid, text_dict[key]])
+                            val_data.append([file_path, sid, text_dict[key]])
                     except:
                         continue
     # Create a dataframe from the data
