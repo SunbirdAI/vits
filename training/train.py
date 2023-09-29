@@ -14,7 +14,7 @@ from torch.cuda.amp import autocast, GradScaler
 from text.mappers import TextMapper, preprocess_char
 from misc import filter_corrupt_files, download_and_extract_drive_file, download_blob, balance_speakers, \
   create_multispeaker_audio_csv, download, convert_and_resample, find_non_allowed_characters, create_regex_for_character_list, \
-  check_nan
+  check_nan, build_csv
 
 import commons
 import utils
@@ -80,7 +80,7 @@ def run(rank, n_gpus, config,device="cpu", g_checkpoint_path = None, d_checkpoin
     convert_and_resample(os.path.join(config["data"]["data_root_dir"], f"{config['data']['language']}-validated"), config["data"]["sampling_rate"])
 
   if config["data"]["build_csv"]:
-    create_multispeaker_audio_csv(config["data"]["data_root_dir"], config["data"]["reference_file"],
+    build_csv(config["data"]["data_root_dir"], config["data"]["reference_file"],
                                   config["data"]["training_files"], config["data"]["validation_files"])
   else:
     filter_corrupt_files(config["data"]["training_files"], "|")

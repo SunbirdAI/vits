@@ -206,7 +206,73 @@ def create_multispeaker_audio_csv(root_dir, text_csv, train_csv = None, val_test
     train_df_audio.to_csv(train_csv, sep='|', index=False, header=None)
     val_df_audio.to_csv(val_test_csv, sep='|', index=False, header=None)
 
+def create_multilingual_audio_csv(root_dirs: list, text_csvs: list, train_csv=None, val_test_csv=None,
+add_language_tag = True):
+    train_data = []
+    val_data = []
+    speaker_ids = {}
+    lang_to_iso = {
+        "LUGANDA": "lug",
+        "ATESO": "teo",
+        "LUGBARA": "lgg",
+        "ACHOLI": "ach",
+        "ENGLISH": "eng",
+        "RUNYANKOLE": "nyn",
+    }
+    
+    for root_dir, text_csv in zip(root_dirs, text_csvs):
+        # Read CSV into dataframe
+        df = pd.read_csv(text_csv)
+        
+        # Preprocess CSV file to map index (Key) to Text
+        text_dict = df.set_index('Key')['Text'].to_dict()
+        
+        # Walk through the directory
+        for subdir, dirs, files in os.walk(root_dir):
+            try:
+                key = int(os.path.basename(subdir))
+            except ValueError:
+                key = None
+            
+            # If the key exists in our CSV
+            if key in text_dict:
+                for file in files:
+                    if file.endswith(".wav"):
+                        try:
+                            sid = speaker_ids[file]
+                        except KeyError:
+                            speaker_ids[file] = len(speaker_ids)
+                            sid = speaker_ids[file]
+                        
+                        # You can adjust this line to modify how the file_path is stored
+                        language_upper = os.path.basename(root_dir)
+                        file_path = os.path.join(language_upper, subdir, file).replace(root_dir + "/", "")                        
+                        # Append the path, key, and associated text to our data
+                        try:
+                            text = lang_to_iso[language_upper.replace("/","")] + text_dict[key]
+                            if df.iloc[key]["split"] == "train":
+                                train_data.append([file_path, sid, text])
+                            else:
+                                val_data.append([file_path, sid, text])
+                        except:
+                            continue
+                        
+    # Create a dataframe from the data
+    train_df_audio = pd.DataFrame(train_data, columns=['Path', 'SID', 'Text'])
+    val_df_audio = pd.DataFrame(val_data, columns=['Path', 'SID', 'Text'])
+    
+    # Save it to a CSV file
+    if train_csv:
+        train_df_audio.to_csv(train_csv, sep='|', index=False, header=None)
+    if val_test_csv:
+        val_df_audio.to_csv(val_test_csv, sep='|', index=False, header=None)
 
+def build_csv(root_dirs, text_csvs, train_csv=None, val_test_csv=None)
+
+    if type(root_dirs) == str:
+        create_multispeaker_audio_csv(root_dirs, text_csvs, train_csv = train_csv, val_test_csv = val_test_csv)
+    else:
+        create_multilingual_audio_csv(root_dirs, text_csvs, train_csv=train_csv, val_test_csv=val_test_csv)
 # Usage:
 # construct_csv('samples_acholi', 'text.csv', 'output.csv')
 
