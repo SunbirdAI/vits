@@ -267,7 +267,7 @@ add_language_tag = True):
     if val_test_csv:
         val_df_audio.to_csv(val_test_csv, sep='|', index=False, header=None)
 
-def build_csv(root_dirs, text_csvs, train_csv=None, val_test_csv=None)
+def build_csv(root_dirs, text_csvs, train_csv=None, val_test_csv=None):
 
     if type(root_dirs) == str:
         create_multispeaker_audio_csv(root_dirs, text_csvs, train_csv = train_csv, val_test_csv = val_test_csv)
