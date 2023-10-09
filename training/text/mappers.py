@@ -1,23 +1,11 @@
-from IPython.display import Audio
 import os
 import re
-import glob
-import json
 import locale
 import tempfile
-import math
 import torch
-from torch import nn
-from torch.nn import functional as F
-from torch.utils.data import DataLoader
-import numpy as np
 import commons
-import utils
-import argparse
 import subprocess
-from models import SynthesizerTrn
-from scipy.io.wavfile import write
-from text import cleaners
+from . import cleaners
 
 def utf_8(x = None, *args, **kwargs):
     return "UTF-8"

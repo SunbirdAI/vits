@@ -14,8 +14,7 @@ hyperparameter. Some cleaners are English-specific. You'll typically want to use
 
 import re
 from unidecode import unidecode
-from phonemizer import phonemize
-from train_config import config
+#from train_config import config #FIXME remove this import, make the cleaning code easy for inference
 
 # Regular expression matching whitespace:
 _whitespace_re = re.compile(r'\s+')
@@ -100,9 +99,9 @@ def luganda_cleaners(text):
   text = collapse_whitespace(text)
   return text
 
-def custom_cleaners(text):
+def custom_cleaners(text, regex):
   text = lowercase(text)
-  text = custom_add(text, regex= config["data"]["custom_cleaner_regex"])
+  text = custom_add(text, regex= regex)#config["data"]["custom_cleaner_regex"])
   text = convert_to_ascii(text)
   text = collapse_whitespace(text)
   return text
