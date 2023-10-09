@@ -3,7 +3,7 @@ import re
 import locale
 import tempfile
 import torch
-import commons
+import ..commons
 import subprocess
 from . import cleaners
 
