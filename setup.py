@@ -2,19 +2,19 @@ from setuptools import setup, find_packages
 
 setup(
     name='sunbird_vits',
-    version='0.0.1alpha',
+    version='0.0.6alpha-1',
     packages=find_packages(),
     install_requires=[
-        "Cython==0.29.21",
-        "librosa==0.8.0",
-        "matplotlib==3.3.1",
-        "numpy==1.18.5",
-        "phonemizer==2.2.1",
-        "scipy==1.5.2",
-        "tensorboard==2.3.0",
-        "torch==1.6.0",
-        "torchvision==0.7.0",
-        "Unidecode==1.1.1"
+        # "Cython==0.29.21",
+        # "librosa==0.8.0",
+        # "matplotlib==3.3.1",
+        # #"numpy",
+        # "phonemizer==2.2.1",
+        # #"scipy==1.5.2",
+        # "tensorboard==2.3.0",
+        # #"torch==1.6.0",
+        # #"torchvision==0.7.0",
+        # "Unidecode==1.1.1"
 
     ],
     entry_points={
