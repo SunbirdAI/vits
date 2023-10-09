@@ -1,8 +1,13 @@
 from setuptools import setup, find_packages
+from distutils.core import setup
+from Cython.Build import cythonize
+import numpy
 
 setup(
     name='sunbird_vits',
     version='0.0.6alpha-1',
+    ext_modules = cythonize("monotic_align/core.pyx"),
+    include_dirs=[numpy.get_include()],
     packages=find_packages(),
     install_requires=[
         # "Cython==0.29.21",
@@ -31,3 +36,7 @@ setup(
     author='Ali Hussein',
     author_email='azawahry@sunbird.ai',
 )
+
+
+  
+  
