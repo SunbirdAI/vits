@@ -31,15 +31,15 @@ class TextMapper(object):
         self._id_to_symbol = {i: s for i, s in enumerate(self.symbols)}
 
     @staticmethod
-    def _clean_text(text, cleaner_names):
+    def _clean_text(text, cleaner_names, cleaner_regex = None):
         for name in cleaner_names:
             cleaner = getattr(cleaners, name)
             if not cleaner:
                 raise Exception('Unknown cleaner: %s' % name)
-            text = cleaner(text)
+            text = cleaner(text, cleaner_regex)
         return text
 
-    def text_to_sequence(self, text, cleaner_names):
+    def text_to_sequence(self, text, cleaner_names, cleaner_regex = None):
         '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
         Args:
         text: string to convert to a sequence
@@ -50,7 +50,7 @@ class TextMapper(object):
         sequence = []
         #clean_text = text.strip()
         sequence = []
-        clean_text = self._clean_text(text, cleaner_names)
+        clean_text = self._clean_text(text, cleaner_names, cleaner_regex)
         for symbol in clean_text:
             symbol_id = self._symbol_to_id[symbol]
             sequence += [symbol_id]
@@ -74,9 +74,9 @@ class TextMapper(object):
             outtext = outtexts[0]
         return outtext
 
-    def get_text(self, text, hps):
-        text_norm = self.text_to_sequence(text, hps.data.text_cleaners)
-        if hps.data.add_blank:
+    def get_text(self, text, cleaner_names, add_blank, cleaner_regex = None):
+        text_norm = self.text_to_sequence(text, cleaner_names, cleaner_regex)
+        if add_blank:
             text_norm = commons.intersperse(text_norm, 0)
         text_norm = torch.LongTensor(text_norm)
         return text_norm
@@ -87,9 +87,9 @@ class TextMapper(object):
         #print(f"text after filtering OOV: {txt_filt}")
         return txt_filt
 
-def preprocess_text(txt, text_mapper, hps, uroman_dir=None, lang=None):
+def preprocess_text(txt, text_mapper, is_uroman = False, uroman_dir=None, lang=None):
     txt = preprocess_char(txt, lang=lang)
-    is_uroman = hps.data.training_files.split('.')[-1] == 'uroman'
+    #is_uroman = hps.data.training_files.split('.')[-1] == 'uroman'
     if is_uroman:
         with tempfile.TemporaryDirectory() as tmp_dir:
             if uroman_dir is None:
