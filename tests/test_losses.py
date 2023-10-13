@@ -1,7 +1,7 @@
 import unittest
 import torch
 
-from ..training.losses import *
+from vits.training.losses import *
 
 class TestLossFunctions(unittest.TestCase):
     

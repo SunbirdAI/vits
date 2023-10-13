@@ -1,7 +1,7 @@
 import torch
 import unittest
 
-from ..training.commons import *
+from vits.training.commons import *
 
 class TestUtils(unittest.TestCase):
 

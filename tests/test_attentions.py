@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 import unittest
 
-from ..training.attentions import *
+from vits.training.attentions import *
 
 class TestModels(unittest.TestCase):
 

@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-from ..training.train_config import config
-from ..training.train import *
+from vits.training.train_config import config
+from vits.training.train import *
 
 class TestTraining(unittest.TestCase):
 

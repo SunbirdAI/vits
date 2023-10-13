@@ -1,7 +1,7 @@
 import torch
 import unittest
 
-from ..training.modules import *
+from vits.training.modules import *
 
 class TestModelComponents(unittest.TestCase):
 

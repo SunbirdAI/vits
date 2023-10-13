@@ -6,7 +6,7 @@ from training.models import SynthesizerTrn
 import torch
 import pytest
 from unittest.mock import Mock
-from ..training.models import (StochasticDurationPredictor, DurationPredictor, TextEncoder, 
+from vits.training.models import (StochasticDurationPredictor, DurationPredictor, TextEncoder, 
                                 ResidualCouplingBlock, PosteriorEncoder, Generator, DiscriminatorP, 
                                 DiscriminatorS, MultiPeriodDiscriminator)
 

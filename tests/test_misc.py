@@ -11,7 +11,7 @@ import re
 import zipfile
 from tqdm import tqdm
 
-from ..training.misc import *
+from vits.training.misc import *
 
 class TestDownloadFunction(unittest.TestCase):
 

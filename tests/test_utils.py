@@ -7,7 +7,7 @@ import subprocess
 import unittest
 import numpy as np
 
-from ..training.utils import *
+from vits.training.utils import *
 
 class MockLogger:
         def info(self, msg):
