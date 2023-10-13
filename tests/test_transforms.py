@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 import unittest
 
-from training.transforms import *
+from ..training.transforms import *
 
 class TestTransforms(unittest.TestCase):
 

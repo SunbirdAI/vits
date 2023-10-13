@@ -6,7 +6,7 @@ import random
 
 
 # Assume the TextAudioLoader class is in a file named 'audio_utils.py'
-from training.data_utils import *
+from ..training.data_utils import *
 
 class TestAudioFunctions(unittest.TestCase):
     

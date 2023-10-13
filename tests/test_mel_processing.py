@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import librosa
 
-from training.mel_processing import *
+from ..training.mel_processing import *
 
 class TestAudioFunctions(unittest.TestCase):
     
