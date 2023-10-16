@@ -6,7 +6,7 @@ import pandas as pd
 import subprocess
 import torchaudio
 from tqdm import tqdm
-from train_config import config
+from .train_config import config
 from zipfile import ZipFile
 import os
 from pydub import AudioSegment

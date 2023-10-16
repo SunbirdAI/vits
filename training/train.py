@@ -16,25 +16,25 @@ from misc import filter_corrupt_files, download_and_extract_drive_file, download
   create_multispeaker_audio_csv, download, convert_and_resample, find_non_allowed_characters, create_regex_for_character_list, \
   check_nan, build_csv
 
-import commons
-import utils
-from data_utils import (
+from . import commons
+from . import utils
+from .data_utils import (
   TextAudioLoader,
   TextAudioCollate,
   DistributedBucketSampler
 )
-from models import (
+from .models import (
   SynthesizerTrn,
   MultiPeriodDiscriminator,
 )
-from losses import (
+from .losses import (
   generator_loss,
   discriminator_loss,
   feature_loss,
   kl_loss
 )
-from mel_processing import mel_spectrogram_torch, spec_to_mel_torch
-from text.symbols import symbols
+from .mel_processing import mel_spectrogram_torch, spec_to_mel_torch
+from .text.symbols import symbols
 
 from data_utils import verify_audio_dir
 

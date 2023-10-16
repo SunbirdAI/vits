@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, Mock
-from ..training.hf_wrapper import VITSInfereceAdapterModel
+from vits.training.hf_wrapper import VITSInfereceAdapterModel
 
 
 raise NotImplementedError
