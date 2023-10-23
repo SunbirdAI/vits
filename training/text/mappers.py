@@ -18,6 +18,7 @@ import subprocess
 from models import SynthesizerTrn
 from scipy.io.wavfile import write
 from text import cleaners
+from tqdm import tqdm
 
 def utf_8(x = None, *args, **kwargs):
     return "UTF-8"
@@ -93,6 +94,9 @@ class TextMapper(object):
         text_norm = torch.LongTensor(text_norm)
         return text_norm
 
+    def get_texts(self, batch, hps):
+        return [self.text_to_sequence(txt, hps.data.text_cleaners) for txt in batch]
+
     def filter_oov(self, text):
         val_chars = self._symbol_to_id
         txt_filt = "".join(list(filter(lambda x: x in val_chars, text)))
@@ -116,6 +120,14 @@ def preprocess_text(txt, text_mapper, hps, uroman_dir=None, lang=None):
     txt = txt.lower()
     txt = text_mapper.filter_oov(txt)
     return txt
+
+def preprocess_batch(batch_texts, text_mapper, hps, uroman_dir=None, lang=None):
+    preprocessed_texts = []
+    for txt in tqdm(batch_texts):
+        txt = preprocess_text(txt, text_mapper, hps, uroman_dir, lang)
+        preprocessed_texts.append(txt)
+    return preprocessed_texts
+
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
