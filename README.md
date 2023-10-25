@@ -55,4 +55,21 @@ python train_ms.py -c configs/vctk_base.json -m vctk_base
 
 
 ## Inference Example
-See [inference.ipynb](inference.ipynb)
+```
+from training.hf_wrapper import VITSInfereceAdapterModel
+# Define constants and prerequisites
+REPO_NAME = "username/repo-name-on-huggingface"
+G_NET_PATH = "path_to_your_G_eng_lug.pth_in_repo"  # Update this path as per your repo
+VOCAB_PATH = "vocab.txt"
+CONFIG_PATH = "config.json"  # Optional
+TEXT_TO_ENCODE = "Hello, world!"
+
+# Use the from_pretrained class method to initialize the model
+model = VITSInfereceAdapterModel.from_pretrained(REPO_NAME, G_NET_PATH, VOCAB_PATH, CONFIG_PATH)
+
+# Encode a piece of text using the model
+encoded_text = model.encode_text(TEXT_TO_ENCODE)
+
+# Print or process the encoded text
+print(encoded_text)
+```
