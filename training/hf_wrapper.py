@@ -38,12 +38,12 @@ class VITSInfereceAdapterModel:
         self.repo_name = repo_name
         #self.hps = self._download_and_load_config(config_path)
         self.text_mapper = self._download_and_load_vocab(vocab_path)
-        self.model  = SynthesizerTrn(
+        self.net_g  = SynthesizerTrn(
                 len(self.text_mapper.symbols),
                 HARDCODED_MODEL_CONFIG["data"]["filter_length"] // 2 + 1,
                 HARDCODED_MODEL_CONFIG["train"]["segment_size"] // HARDCODED_MODEL_CONFIG["data"]["hop_length"],
                 **HARDCODED_MODEL_CONFIG['model'])
-        self.net_g = self._download_and_load_model(model_path)
+        self.net_g = self._download_and_load_model(model_path, self.net_g, None)
 
     def _download_and_load_model(self, model_path):
         """
