@@ -56,14 +56,14 @@ def lowercase(text):
   return text.lower()
 
 
-def collapse_whitespace(text):
+def collapse_whitespace(text, **_):
   return re.sub(_whitespace_re, ' ', text)
 
-def acholi_add(text):
+def acholi_add(text, **_):
   text = re.sub(r'[!?xz/\[\]\,\.@;#$%^&*]', ' ', text)
   return text
 
-def luganda_add(text):
+def luganda_add(text, **_):
   text = re.sub(r'[!?x:/\[\]\,\.@;#$%^&*]', ' ', text)
   return text
 
@@ -76,14 +76,14 @@ def convert_to_ascii(text):
   return unidecode(text)
 
 
-def basic_cleaners(text):
+def basic_cleaners(text, **_):
   '''Basic pipeline that lowercases and collapses whitespace without transliteration.'''
   text = lowercase(text)
   text = collapse_whitespace(text)
   return text
 
 
-def transliteration_cleaners(text):
+def transliteration_cleaners(text, **_):
   '''Pipeline for non-English text that transliterates to ASCII.'''
   text = lowercase(text)
   text = acholi_add(text)
@@ -91,7 +91,7 @@ def transliteration_cleaners(text):
   text = collapse_whitespace(text)
   return text
 
-def luganda_cleaners(text):
+def luganda_cleaners(text, **_):
   '''Pipeline for non-English text that transliterates to ASCII.'''
   text = lowercase(text)
   text = luganda_add(text)
@@ -116,7 +116,7 @@ def english_cleaners(text):
   return phonemes
 
 
-def english_cleaners2(text):
+def english_cleaners2(text, **_):
   '''Pipeline for English text, including abbreviation expansion. + punctuation + stress'''
   text = convert_to_ascii(text)
   text = lowercase(text)

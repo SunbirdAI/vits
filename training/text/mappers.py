@@ -74,7 +74,7 @@ class TextMapper(object):
             outtext = outtexts[0]
         return outtext
 
-    def get_text(self, text, cleaner_names, add_blank, cleaner_regex = None):
+    def get_text(self, text, cleaner_names, cleaner_regex = None, add_blank = True):
         text_norm = self.text_to_sequence(text, cleaner_names, cleaner_regex)
         if add_blank:
             text_norm = commons.intersperse(text_norm, 0)

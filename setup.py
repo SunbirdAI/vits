@@ -5,7 +5,7 @@ import numpy
 
 setup(
     name='sunbird_vits',
-    version='0.0.6alpha-1',
+    version='0.0.6alpha-3',
     ext_modules = cythonize("training/monotonic_align/core.pyx"),
     include_dirs=[numpy.get_include()],
     packages=find_packages(),
