@@ -14,7 +14,7 @@ class VITSInfereceAdapterModel:
 
     def __init__(self, model_path, config_path, vocab_path, repo_name):
         self.repo_name = repo_name
-        self.hps = self._download_and_load_config(config_path)
+        #self.hps = self._download_and_load_config(config_path)
         self.text_mapper = self._download_and_load_vocab(vocab_path)
         self.model  = SynthesizerTrn(
                 len(self.text_mapper.symbols),
